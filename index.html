@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rumb</title>
+  <title>Rumb — Yohei Tsukasaki</title>
+  <meta name="description" content="Rumb is the solo project of Japanese composer, arranger and mix engineer Yohei Tsukasaki, handling every stage from the first sound to the final master.">
+  <meta name="author" content="Yohei Tsukasaki">
+  <link rel="canonical" href="https://rumb.jp/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://rumb.jp/">
+  <meta property="og:title" content="Rumb — Yohei Tsukasaki">
+  <meta property="og:description" content="Composer · Arranger · Mix Engineer. The solo project of Yohei Tsukasaki, from the first sound to the final master.">
+  <meta property="og:site_name" content="Rumb">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Rumb — Yohei Tsukasaki">
+  <meta name="twitter:description" content="Composer · Arranger · Mix Engineer. The solo project of Yohei Tsukasaki, from the first sound to the final master.">
+  <meta name="theme-color" content="#080808">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <style>
@@ -13,10 +26,11 @@
       background: #080808;
       color: #e8e8e8;
       min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      overflow-x: hidden;
     }
     body::before {
       content: '';
@@ -48,24 +62,48 @@
       letter-spacing: 0.35em;
       color: #fff;
       line-height: 1;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      text-indent: 0.35em; /* 字間ぶんの右側の余白を打ち消して中央に揃える */
+    }
+    .person {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
+      color: #a0a0a0;
+      margin-bottom: 18px;
     }
     .title {
       font-weight: 300;
       font-size: 0.65rem;
       letter-spacing: 0.45em;
-      color: #555;
+      text-indent: 0.45em;
+      color: #808080;
       text-transform: uppercase;
       margin-bottom: 72px;
+    }
+    .title span { white-space: nowrap; }
+    @media (max-width: 420px) {
+      .title { letter-spacing: 0.28em; text-indent: 0.28em; }
     }
     .message {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
       font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: #777;
+      color: #808080;
       line-height: 2;
-      margin-bottom: 72px;
+      margin-bottom: 40px;
+    }
+    .bio {
+      font-weight: 300;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      line-height: 2;
+      color: #808080;
+      max-width: 460px;
+      margin: 0 auto 72px;
     }
     .divider {
       width: 1px;
@@ -76,17 +114,17 @@
     .contact button {
       display: inline-block;
       padding: 11px 36px;
-      border: 1px solid #2a2a2a;
+      border: 1px solid #3a3a3a;
       background: none;
       font-family: 'Inter', sans-serif;
       font-size: 0.6rem;
       letter-spacing: 0.45em;
-      color: #444;
+      color: #808080;
       cursor: pointer;
       text-transform: uppercase;
       transition: all 0.4s;
     }
-    .contact button:hover { border-color: #555; color: #aaa; }
+    .contact button:hover, .contact button:focus-visible { border-color: #666; color: #ccc; }
     .overlay {
       display: none;
       position: fixed;
@@ -117,19 +155,20 @@
       font-family: 'Inter', sans-serif;
       font-size: 0.65rem;
       letter-spacing: 0.3em;
-      color: #555;
+      color: #888;
       text-decoration: none;
       text-align: left;
       text-transform: uppercase;
       cursor: pointer;
       transition: color 0.3s;
     }
-    .popup a:hover, .popup button:hover { color: #ccc; }
+    .popup a:hover, .popup button:hover,
+    .popup a:focus-visible, .popup button:focus-visible { color: #e8e8e8; }
     .popup-divider { height: 1px; background: #1e1e1e; margin: 0 4px; }
     .copy-msg {
       font-size: 0.55rem;
       letter-spacing: 0.2em;
-      color: #444;
+      color: #888;
       text-align: center;
       padding: 6px 0 4px;
       display: none;
@@ -140,10 +179,16 @@
 <body>
   <div class="container">
     <h1 class="name">Rumb</h1>
-    <p class="title">Composer &nbsp;·&nbsp; Arranger &nbsp;·&nbsp; Mix Engineer</p>
+    <p class="person">Yohei Tsukasaki</p>
+    <p class="title"><span>Composer</span> &nbsp;·&nbsp; <span>Arranger</span> &nbsp;·&nbsp; <span>Mix Engineer</span></p>
     <p class="message">
       "Life isn't about waiting for the storm to pass.<br>
       It's about learning to make music in the rain."
+    </p>
+    <p class="bio">
+      Rumb is the solo project of Japanese composer, arranger and mix engineer Yohei Tsukasaki.
+      Drawing on over two decades of studio work, he handles every stage himself — from the first sound to the final master.
+      Past releases include the album “pop calendar” (Teichiku Records) and digital releases via Zankyo Record.
     </p>
     <div class="contact">
       <div class="divider"></div>
@@ -152,12 +197,12 @@
   </div>
 
   <div class="overlay" onclick="if(event.target===this)this.classList.remove('active')">
-    <div class="popup">
+    <div class="popup" role="dialog" aria-modal="true" aria-label="Contact">
       <a href="https://mail.google.com/mail/?view=cm&to=yohey@rumb.jp" target="_blank"
          onclick="document.querySelector('.overlay').classList.remove('active')">Gmail</a>
       <div class="popup-divider"></div>
       <a href="mailto:yohey@rumb.jp"
-         onclick="document.querySelector('.overlay').classList.remove('active')">メールアプリ</a>
+         onclick="document.querySelector('.overlay').classList.remove('active')">Mail App</a>
       <div class="popup-divider"></div>
       <button onclick="copyEmail()">Copy Address</button>
       <p class="copy-msg" id="copyMsg">Copied !</p>
@@ -175,6 +220,11 @@
         }, 1200);
       });
     }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelector('.overlay').classList.remove('active');
+      }
+    });
   </script>
 </body>
 </html>
