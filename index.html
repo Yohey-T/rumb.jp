@@ -16,44 +16,38 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Rumb — Yohei Tsukasaki">
   <meta name="twitter:description" content="Composer · Arranger · Mix Engineer. The solo project of Yohei Tsukasaki, from the first sound to the final master.">
-  <meta name="theme-color" content="#080808">
+  <meta name="theme-color" content="#000000">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { background: #000; scroll-behavior: smooth; }
     body {
       font-family: 'Inter', sans-serif;
-      background: #080808;
-      color: #e8e8e8;
+      /* canvas が使えない環境向けの下地（宇宙の空） */
+      background: linear-gradient(to bottom, #000 0%, #030408 55%, #07080d 100%) fixed;
+      color: #e8ecff;
+      overflow-x: hidden;
+    }
+    #scene {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .container { position: relative; z-index: 1; text-align: center; }
+
+    /* 1画面目：名前と、宇宙に浮かぶ輪の街 */
+    .hero {
       min-height: 100vh;
       min-height: 100svh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      overflow-x: hidden;
-    }
-    body::before {
-      content: '';
-      position: fixed;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background:
-        radial-gradient(ellipse at 65% 40%, rgba(180,100,60,0.07) 0%, transparent 55%),
-        radial-gradient(ellipse at 30% 70%, rgba(80,60,150,0.05) 0%, transparent 50%);
-      animation: drift 20s ease-in-out infinite alternate;
-      pointer-events: none;
-    }
-    @keyframes drift {
-      0%   { transform: translate(0, 0); }
-      100% { transform: translate(2%, 1.5%); }
-    }
-    .container {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 40px 24px;
-      max-width: 600px;
-      width: 100%;
+      padding: clamp(40px, 9vh, 110px) 24px 0;
+      text-shadow: 0 0 14px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.85);
     }
     .name {
       font-family: 'Cormorant Garamond', serif;
@@ -64,6 +58,7 @@
       line-height: 1;
       margin-bottom: 18px;
       text-indent: 0.35em; /* 字間ぶんの右側の余白を打ち消して中央に揃える */
+      text-shadow: 0 0 42px rgba(200,215,255,0.32), 0 0 16px rgba(0,0,0,0.95);
     }
     .person {
       font-family: 'Cormorant Garamond', serif;
@@ -71,7 +66,7 @@
       font-size: clamp(0.95rem, 2.2vw, 1.15rem);
       letter-spacing: 0.3em;
       text-indent: 0.3em;
-      color: #a0a0a0;
+      color: #c9d1ea;
       margin-bottom: 18px;
     }
     .title {
@@ -79,20 +74,53 @@
       font-size: 0.65rem;
       letter-spacing: 0.45em;
       text-indent: 0.45em;
-      color: #808080;
+      color: #8fd3ff;
       text-transform: uppercase;
-      margin-bottom: 72px;
     }
     .title span { white-space: nowrap; }
     @media (max-width: 420px) {
       .title { letter-spacing: 0.28em; text-indent: 0.28em; }
     }
+    .cue {
+      margin-top: auto;
+      padding: 0 12px 26px;
+      font-size: 0.55rem;
+      letter-spacing: 0.45em;
+      text-indent: 0.45em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #a9b6d6;
+      transition: color 0.3s;
+    }
+    .cue:hover, .cue:focus-visible { color: #fff; }
+    .cue::after {
+      content: '';
+      display: block;
+      width: 1px;
+      height: 34px;
+      margin: 12px auto 0;
+      background: linear-gradient(to bottom, rgba(143,211,255,0.9), rgba(143,211,255,0));
+      animation: cue 2.2s ease-in-out infinite;
+      transform-origin: top;
+    }
+    @keyframes cue {
+      0%   { transform: scaleY(0); opacity: 0; }
+      40%  { transform: scaleY(1); opacity: 1; }
+      100% { transform: scaleY(1); opacity: 0; }
+    }
+
+    /* 2画面目：言葉・自己紹介・連絡先。背景を少し暗くして読みやすくする */
+    .about {
+      padding: 150px 24px 110px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 0, rgba(0,0,0,0.78) 150px, rgba(0,0,0,0.78) 100%);
+    }
+    .about > * { max-width: 600px; margin-left: auto; margin-right: auto; }
     .message {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 300;
       font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: #808080;
+      color: #b4bcd8;
       line-height: 2;
       margin-bottom: 40px;
     }
@@ -101,43 +129,49 @@
       font-size: 0.75rem;
       letter-spacing: 0.04em;
       line-height: 2;
-      color: #808080;
+      color: #a3acc6;
       max-width: 460px;
-      margin: 0 auto 72px;
+      margin-bottom: 56px;
     }
     .divider {
       width: 1px;
       height: 48px;
-      background: linear-gradient(to bottom, transparent, #333, transparent);
+      background: linear-gradient(to bottom, transparent, rgba(143,211,255,0.55), transparent);
       margin: 0 auto 28px;
     }
     .contact button {
       display: inline-block;
       padding: 11px 36px;
-      border: 1px solid #3a3a3a;
-      background: none;
+      border: 1px solid rgba(143,211,255,0.4);
+      background: rgba(6,7,11,0.85);
       font-family: 'Inter', sans-serif;
       font-size: 0.6rem;
       letter-spacing: 0.45em;
-      color: #808080;
+      text-indent: 0.45em;
+      color: #b5d6f0;
       cursor: pointer;
       text-transform: uppercase;
       transition: all 0.4s;
     }
-    .contact button:hover, .contact button:focus-visible { border-color: #666; color: #ccc; }
+    .contact button:hover, .contact button:focus-visible {
+      border-color: #8fd3ff;
+      color: #fff;
+      box-shadow: 0 0 22px rgba(143,211,255,0.35);
+    }
     .overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.72);
       z-index: 100;
       align-items: center;
       justify-content: center;
     }
     .overlay.active { display: flex; }
     .popup {
-      background: #111;
-      border: 1px solid #222;
+      background: #0a0b10;
+      border: 1px solid rgba(143,211,255,0.25);
+      box-shadow: 0 0 40px rgba(120,160,220,0.12);
       padding: 8px;
       width: 220px;
       animation: fadeUp 0.2s ease;
@@ -155,7 +189,7 @@
       font-family: 'Inter', sans-serif;
       font-size: 0.65rem;
       letter-spacing: 0.3em;
-      color: #888;
+      color: #9aa3bd;
       text-decoration: none;
       text-align: left;
       text-transform: uppercase;
@@ -163,38 +197,48 @@
       transition: color 0.3s;
     }
     .popup a:hover, .popup button:hover,
-    .popup a:focus-visible, .popup button:focus-visible { color: #e8e8e8; }
-    .popup-divider { height: 1px; background: #1e1e1e; margin: 0 4px; }
+    .popup a:focus-visible, .popup button:focus-visible { color: #fff; }
+    .popup-divider { height: 1px; background: rgba(143,211,255,0.14); margin: 0 4px; }
     .copy-msg {
       font-size: 0.55rem;
       letter-spacing: 0.2em;
-      color: #888;
+      color: #8fd3ff;
       text-align: center;
       padding: 6px 0 4px;
       display: none;
     }
     .copy-msg.show { display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .cue::after { animation: none; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="name">Rumb</h1>
-    <p class="person">Yohei Tsukasaki</p>
-    <p class="title"><span>Composer</span> &nbsp;·&nbsp; <span>Arranger</span> &nbsp;·&nbsp; <span>Mix Engineer</span></p>
-    <p class="message">
-      "Life isn't about waiting for the storm to pass.<br>
-      It's about learning to make music in the rain."
-    </p>
-    <p class="bio">
-      Rumb is the solo project of Japanese composer, arranger and mix engineer Yohei Tsukasaki.
-      Drawing on over two decades of studio work, he handles every stage himself — from the first sound to the final master.
-      Past releases include the album “pop calendar” (Teichiku Records) and digital releases via Zankyo Record.
-    </p>
-    <div class="contact">
-      <div class="divider"></div>
-      <button onclick="document.querySelector('.overlay').classList.add('active')">Contact</button>
-    </div>
-  </div>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <main class="container">
+    <header class="hero">
+      <h1 class="name">Rumb</h1>
+      <p class="person">Yohei Tsukasaki</p>
+      <p class="title"><span>Composer</span> &nbsp;·&nbsp; <span>Arranger</span> &nbsp;·&nbsp; <span>Mix Engineer</span></p>
+      <a class="cue" href="#about">Scroll</a>
+    </header>
+    <section class="about" id="about">
+      <p class="message">
+        "Life isn't about waiting for the storm to pass.<br>
+        It's about learning to make music in the rain."
+      </p>
+      <p class="bio">
+        Rumb is the solo project of Japanese composer, arranger and mix engineer Yohei Tsukasaki.
+        Drawing on over two decades of studio work, he handles every stage himself — from the first sound to the final master.
+        Past releases include the album “pop calendar” (Teichiku Records) and digital releases via Zankyo Record.
+      </p>
+      <div class="contact">
+        <div class="divider"></div>
+        <button onclick="document.querySelector('.overlay').classList.add('active')">Contact</button>
+      </div>
+    </section>
+  </main>
 
   <div class="overlay" onclick="if(event.target===this)this.classList.remove('active')">
     <div class="popup" role="dialog" aria-modal="true" aria-label="Contact">
@@ -225,6 +269,409 @@
         document.querySelector('.overlay').classList.remove('active');
       }
     });
+
+    /* ---- 背景：宇宙に浮かぶ輪の街（立体として計算して描く）---- */
+    (() => {
+      const cv = document.getElementById('scene');
+      const x = cv.getContext && cv.getContext('2d');
+      if (!x) return;
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const TAU = Math.PI * 2, PI = Math.PI;
+      const R = 1, T = 0.09, HH = 0.17;       // 輪の内側の半径・厚み・高さの半分
+      const N = 120, DTH = TAU / N;           // 輪を何枚の板に分けるか
+      const D = 4.2;                          // カメラまでの距離（遠近感の強さ）
+      const HUB = 0.085, DRUM = 0.15, DRUMH = 0.24, SPOKES = 6;
+      const COLS = ['#ffd08a', '#ffb86b', '#8fd3ff', '#ff8fd0', '#f4f1ff', '#9dffcf'];
+
+      let W = 0, H = 0, dpr = 1, S = 1, cx = 0, cy = 0, cy0 = 0, tilt0 = 0.45;
+      let sa = 0, ca = 1, K = 1, LS = 1, bg = null;
+      let stars = [], segs = [], builds = [], hubL = [], ships = [], order = [];
+      let shoot = null, nextShoot = 2, mx = 0, my = 0, vx = 0, vy = 0;
+      const o = new Float32Array(8);
+
+      // 毎回同じ街になるよう、種つきの乱数を使う
+      const rng = (a) => () => {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+      const pal = (a, b) => {                 // 暗い色→明るい色の段階を先に作っておく
+        const c = [];
+        for (let i = 0; i <= 24; i++) {
+          c.push('rgb(' + a.map((v, j) => Math.round(v + (b[j] - v) * i / 24)).join(',') + ')');
+        }
+        return (v) => c[v <= 0 ? 0 : v >= 1 ? 24 : (v * 24) | 0];
+      };
+      const shWall = pal([4, 5, 9], [22, 25, 38]);
+      const shHull = pal([3, 4, 7], [50, 55, 72]);
+      const shHub  = pal([3, 4, 7], [48, 53, 70]);
+      const shTop  = pal([10, 11, 17], [40, 44, 60]);
+
+      // 3Dの位置 → 画面上の位置（結果は o[i*2], o[i*2+1]、拡大率は K）
+      function P(X, Y, Z, i) {
+        const y2 = Y * ca + Z * sa, z2 = -Y * sa + Z * ca;
+        K = D / (D + z2);
+        o[i * 2] = cx + X * K * S; o[i * 2 + 1] = cy - y2 * K * S;
+      }
+      function quad() {
+        x.beginPath(); x.moveTo(o[0], o[1]); x.lineTo(o[2], o[3]);
+        x.lineTo(o[4], o[5]); x.lineTo(o[6], o[7]); x.closePath(); x.fill();
+      }
+      function dot(px, py, r, c, a) {
+        x.fillStyle = c;
+        x.globalAlpha = a * 0.22; x.beginPath(); x.arc(px, py, r * 3.2, 0, TAU); x.fill();
+        x.globalAlpha = a;        x.beginPath(); x.arc(px, py, r, 0, TAU); x.fill();
+      }
+      function ringLine(r, y, a0, a1, style, w) {
+        x.strokeStyle = style; x.lineWidth = w; x.beginPath();
+        for (let i = 0; i <= 48; i++) {
+          const a = a0 + (a1 - a0) * i / 48;
+          P(r * Math.cos(a), y, r * Math.sin(a), 0);
+          if (i) x.lineTo(o[0], o[1]); else x.moveTo(o[0], o[1]);
+        }
+        x.stroke();
+      }
+
+      function model() {                      // 街の中身（灯り・建物・船）を一度だけ決める
+        const r = rng(20261111);
+        const col = () => { const k = r(); return COLS[k < 0.5 ? 0 : k < 0.66 ? 1 : k < 0.83 ? 2 : k < 0.92 ? 3 : k < 0.97 ? 4 : 5]; };
+        segs = []; builds = []; hubL = []; ships = [];
+        for (let i = 0; i < N; i++) {
+          const wall = [], hull = [];
+          for (let j = 0; j < 24; j++) wall.push({ u: r(), v: r() * 1.8 - 0.9, c: col(), a: 0.35 + r() * 0.65, s: 0.5 + r() * 2.5, p: r() * TAU });
+          for (let j = 0; j < 5; j++)  hull.push({ u: r(), v: r() * 1.7 - 0.85, c: r() < 0.7 ? '#ffd08a' : '#8fd3ff', a: 0.3 + r() * 0.6 });
+          segs.push({ wall, hull });
+          const nb = r() < 0.5 ? 3 : 2;      // 輪の内側から中心へ伸びる建物
+          for (let j = 0; j < nb; j++) {
+            const tall = r() < 0.16, lights = [];
+            const b = { th: (i + r()) * DTH, y: (r() * 2 - 1) * HH * 0.72, wt: DTH * (0.22 + r() * 0.4),
+                        wy: 0.028 + r() * 0.05, b: tall ? 0.14 + r() * 0.13 : 0.035 + r() * 0.085, tall, lights, tl: [], sn: 0, p: r() * TAU };
+            for (let q = 0; q < 3; q++) b.tl.push({ du: r() * 0.7 - 0.35, f: 0.15 + r() * 0.8, c: col(), a: 0.45 + r() * 0.5 });
+            const nl = 2 + ((r() * 5) | 0);
+            for (let q = 0; q < nl; q++) lights.push({ du: r() * 0.8 - 0.4, dv: r() * 0.8 - 0.4, c: col(), a: 0.5 + r() * 0.5 });
+            builds.push(b);
+          }
+        }
+        for (let i = 0; i < 190; i++) hubL.push({ g: r() * TAU, y: (r() * 2 - 1) * DRUMH * 0.9, rr: DRUM, c: col(), a: 0.4 + r() * 0.6, s: 0.6 + r() * 2, p: r() * TAU });
+        for (let i = 0; i < 130; i++) {
+          const y = r() < 0.5 ? -(DRUMH + r() * 1.7) : DRUMH + r() * r() * 2.4;
+          hubL.push({ g: r() * TAU, y, rr: HUB, c: r() < 0.75 ? '#ffd08a' : '#8fd3ff', a: (y > 0.7 ? 0.3 : 0.55) * (0.5 + r() * 0.5), s: 0.6 + r() * 2, p: r() * TAU });
+        }
+        for (let i = 0; i < 8; i++) {
+          ships.push({ r: 1.32 + r() * 1.15, w: (r() < 0.5 ? 1 : -1) * TAU / (11 + r() * 14), p: r() * TAU,
+                       y0: r() * 0.9 - 0.35, inc: 0.08 + r() * 0.3, c: r() < 0.5 ? '#9fdcff' : '#ffd9a0' });
+        }
+      }
+
+      function build() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth; H = window.innerHeight;
+        if (!W || !H) { bg = null; return; }  // 画面がまだ表示されていないときは描かない
+        cv.width = Math.ceil(W * dpr); cv.height = Math.ceil(H * dpr);
+        const tallScreen = H > W * 1.15;
+        tilt0 = tallScreen ? 0.64 : 0.46;     // 縦長の画面では少し上から見下ろす
+        const half = tallScreen ? W * 0.485 : Math.min(W * 0.45, H * 0.52);
+        S = half / (R + T);
+        cy0 = H * (tallScreen ? 0.61 : 0.6);
+        cx = W / 2;
+        LS = Math.max(1.1, S * 0.0072);
+
+        // 動かない背景（空・星雲・足もとに広がる大きな星の縁）を先に1枚の絵にしておく
+        const c = document.createElement('canvas');
+        c.width = cv.width; c.height = cv.height;
+        const g = c.getContext('2d'); g.scale(dpr, dpr);
+        const sky = g.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#000000'); sky.addColorStop(0.55, '#030408'); sky.addColorStop(1, '#07080d');
+        g.fillStyle = sky; g.fillRect(0, 0, W, H);
+        const glow = (gx, gy, gr, c0) => {
+          const n = g.createRadialGradient(gx, gy, 0, gx, gy, gr);
+          n.addColorStop(0, c0); n.addColorStop(1, 'rgba(0,0,0,0)');
+          g.fillStyle = n; g.fillRect(0, 0, W, H);
+        };
+        const m = Math.max(W, H);
+        glow(W * 0.18, H * 0.22, m * 0.5, 'rgba(60,60,110,0.08)');
+        glow(W * 0.85, H * 0.4, m * 0.45, 'rgba(30,80,110,0.05)');
+
+        const Rp = m * 2.1, pcx = W * 0.38, pTop = cy0 - S * 0.72, pcy = pTop + Rp;
+        const at = g.createRadialGradient(pcx, pcy, Rp, pcx, pcy, Rp * 1.03);
+        at.addColorStop(0, 'rgba(150,195,240,0.42)'); at.addColorStop(0.35, 'rgba(110,150,210,0.10)'); at.addColorStop(1, 'rgba(110,150,210,0)');
+        g.fillStyle = at; g.fillRect(0, 0, W, H);
+        g.save();
+        g.beginPath(); g.arc(pcx, pcy, Rp, 0, TAU); g.clip();
+        const pg = g.createRadialGradient(pcx, pcy, Rp * 0.9, pcx, pcy, Rp);
+        pg.addColorStop(0, '#010204'); pg.addColorStop(0.6, '#03060d'); pg.addColorStop(0.955, '#0a1a30'); pg.addColorStop(1, '#8fb4d6');
+        g.fillStyle = pg; g.fillRect(0, 0, W, H);
+        const r2 = rng(99);
+        for (let i = 0; i < 46; i++) {        // うっすらした雲
+          const qx = r2() * W, qy = pTop + 20 + r2() * (H - pTop), rw = 60 + r2() * m * 0.22;
+          g.save(); g.translate(qx, qy); g.scale(1, 0.28 + r2() * 0.2);
+          const cg = g.createRadialGradient(0, 0, 0, 0, 0, rw);
+          cg.addColorStop(0, 'rgba(200,215,235,' + (0.03 + r2() * 0.045) + ')'); cg.addColorStop(1, 'rgba(210,230,255,0)');
+          g.fillStyle = cg; g.beginPath(); g.arc(0, 0, rw, 0, TAU); g.fill(); g.restore();
+        }
+        g.restore();
+        glow(0, pcy - Math.sqrt(Math.max(0, Rp * Rp - pcx * pcx)), m * 0.3, 'rgba(255,170,120,0.07)');
+        bg = c;
+
+        const r = rng(7);
+        stars = [];
+        const n = Math.min(700, Math.round(W * H / 2200));
+        for (let i = 0; i < n; i++) {
+          const sx = r() * W, sy = r() * H;
+          if (Math.hypot(sx - pcx, sy - pcy) < Rp * 1.004) { r(); r(); r(); r(); r(); continue; }
+          const k = r();
+          stars.push({ x: sx, y: sy, s: k < 0.86 ? 0.6 + r() * 0.7 : 1.3 + r() * 0.9, a: 0.25 + r() * 0.7,
+                       p: r() * TAU, v: 0.5 + r() * 2.2, c: r() < 0.25 ? '#bcd6ff' : '#ffffff' });
+        }
+      }
+
+      function building(b, th, far) {
+        const tA = th - b.wt / 2, tB = th + b.wt / 2, yA = b.y - b.wy / 2, yB = b.y + b.wy / 2, rr = R - b.b;
+        const cA = Math.cos(tA), sA = Math.sin(tA), cB = Math.cos(tB), sB = Math.sin(tB);
+        x.globalAlpha = 1; x.fillStyle = '#05060a';
+        P(R * cA, yA, R * sA, 0); P(R * cA, yB, R * sA, 1); P(rr * cA, yB, rr * sA, 2); P(rr * cA, yA, rr * sA, 3); quad();
+        P(R * cB, yA, R * sB, 0); P(R * cB, yB, R * sB, 1); P(rr * cB, yB, rr * sB, 2); P(rr * cB, yA, rr * sB, 3); quad();
+        x.fillStyle = far ? '#262a36' : '#1a1c25';                       // 上の面（上からの光を受ける）
+        P(R * cA, yB, R * sA, 0); P(R * cB, yB, R * sB, 1); P(rr * cB, yB, rr * sB, 2); P(rr * cA, yB, rr * sA, 3); quad();
+        for (const l of b.tl) {                                           // 側面に並ぶ窓の灯り
+          const a = th + l.du * b.wt, rl = R - b.b * l.f;
+          P(rl * Math.cos(a), yB, rl * Math.sin(a), 0);
+          const z = LS * K * 0.9; x.globalAlpha = l.a * (far ? 1 : 0.75); x.fillStyle = l.c; x.fillRect(o[0] - z / 2, o[1] - z / 2, z, z);
+        }
+        x.globalAlpha = 1;
+        if (!far) return;
+        x.fillStyle = '#0d0e15';                                          // 屋上（中心を向いた面）
+        P(rr * cA, yA, rr * sA, 0); P(rr * cB, yA, rr * sB, 1); P(rr * cB, yB, rr * sB, 2); P(rr * cA, yB, rr * sA, 3); quad();
+        for (const l of b.lights) {
+          const a = th + l.du * b.wt;
+          P(rr * Math.cos(a), b.y + l.dv * b.wy, rr * Math.sin(a), 0);
+          const z = LS * K; x.globalAlpha = l.a; x.fillStyle = l.c; x.fillRect(o[0] - z / 2, o[1] - z / 2, z, z);
+        }
+      }
+
+      function cyl(r, y0, y1, dim) {               // 塔（円柱）を縦の板に分けて、丸く見えるよう明暗をつける
+        const M = 18;
+        for (let m = 0; m < M; m++) {
+          const f0 = PI + m * PI / M, f1 = PI + (m + 1) * PI / M, fm = (f0 + f1) / 2;
+          x.fillStyle = shHub((0.06 + 0.3 * -Math.sin(fm) + 0.6 * Math.max(0, -Math.cos(fm))) * (dim || 1));
+          P(r * Math.cos(f0), y1, r * Math.sin(f0), 0); P(r * Math.cos(f1), y1, r * Math.sin(f1), 1);
+          P(r * Math.cos(f1), y0, r * Math.sin(f1), 2); P(r * Math.cos(f0), y0, r * Math.sin(f0), 3); quad();
+        }
+      }
+
+      function spoke(th, t, j) {
+        const c = Math.cos(th), s = Math.sin(th);
+        P(DRUM * c, 0, DRUM * s, 0); const w0 = K; P(R * c, 0, R * s, 1);
+        const lw = Math.max(1.5, 0.022 * S * (w0 + K) / 2);
+        x.globalAlpha = 1; x.lineCap = 'butt';
+        x.strokeStyle = '#15171f'; x.lineWidth = lw;
+        x.beginPath(); x.moveTo(o[0], o[1]); x.lineTo(o[2], o[3]); x.stroke();
+        x.strokeStyle = 'rgba(170,200,255,0.4)'; x.lineWidth = Math.max(0.6, lw * 0.22);
+        x.beginPath(); x.moveTo(o[0], o[1] - lw * 0.3); x.lineTo(o[2], o[3] - lw * 0.3); x.stroke();
+        for (let q = 0; q < 2; q++) {         // 塔と輪を行き来する連絡ポッド
+          let u = (t * 0.085 + j * 0.37 + q * 0.5) % 1; u = u < 0.5 ? u * 2 : 2 - u * 2;
+          const rr = DRUM + u * (R - DRUM);
+          P(rr * c, 0.012, rr * s, 0);
+          dot(o[0], o[1], Math.max(1.2, LS * K * 1.05), q ? '#ffe0a8' : '#aee6ff', 1);
+        }
+      }
+
+      function drawShips(t, far) {
+        for (const s of ships) {
+          const u = s.p + t * s.w, d = Math.sign(s.w);
+          if ((Math.sin(u) > 0) !== far) continue;
+          let px = 0, py = 0;
+          x.strokeStyle = s.c; x.lineCap = 'round';
+          for (let q = 12; q >= 0; q--) {     // 光の尾
+            const uu = u - d * q * 0.028;
+            P(s.r * Math.cos(uu), s.y0 + s.inc * Math.sin(uu * 2 + s.p), s.r * Math.sin(uu), 0);
+            if (q < 12) {
+              x.globalAlpha = (1 - q / 12) * 0.6; x.lineWidth = Math.max(1, LS * K * 0.9);
+              x.beginPath(); x.moveTo(px, py); x.lineTo(o[0], o[1]); x.stroke();
+            }
+            px = o[0]; py = o[1];
+          }
+          dot(px, py, Math.max(1.4, LS * K * 1.25), '#ffffff', 1);
+          if (Math.sin(t * 6 + s.p) > 0.7) dot(px, py, Math.max(1.2, LS * K), '#ff6a7a', 0.9);
+        }
+        x.globalAlpha = 1;
+      }
+
+      let last = 0;
+      function frame(ms) {
+        if (!bg) { build(); if (!bg) return; }
+        const t = still ? 14 : ms / 1000, dt = Math.min(0.1, t - last || 0); last = t;
+        vx += (mx - vx) * 0.05; vy += (my - vy) * 0.05;
+        const sp = Math.min(1, (window.scrollY || 0) / H);
+        const tilt = tilt0 + sp * 0.2 + vy * 0.07;   // スクロールやマウスで見る角度が少し変わる
+        sa = Math.sin(tilt); ca = Math.cos(tilt);
+        cy = cy0 - sp * H * 0.05;
+        const rot = t * TAU / 64 + vx * 0.35;        // 街ぜんたいが約1分で1回転
+
+        x.setTransform(dpr, 0, 0, dpr, 0, 0);
+        x.globalAlpha = 1; x.drawImage(bg, 0, 0, W, H);
+        for (const s of stars) {
+          x.globalAlpha = s.a * (0.55 + 0.45 * Math.sin(t * s.v + s.p));
+          x.fillStyle = s.c; x.fillRect(s.x, s.y, s.s, s.s);
+        }
+        if (!still) {                                // 流れ星
+          if (!shoot && t > nextShoot) shoot = { x: W * (0.2 + Math.random() * 0.8), y: H * Math.random() * 0.35, life: 0 };
+          if (shoot) {
+            shoot.life += dt;
+            const k = shoot.life / 0.8, sx = shoot.x - k * 300, sy = shoot.y + k * 140;
+            const lg = x.createLinearGradient(sx, sy, sx + 110, sy - 51);
+            lg.addColorStop(0, 'rgba(255,255,255,' + Math.sin(PI * Math.min(k, 1)) + ')'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+            x.globalAlpha = 1; x.strokeStyle = lg; x.lineWidth = 1.4;
+            x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + 110, sy - 51); x.stroke();
+            if (k >= 1) { shoot = null; nextShoot = t + 3 + Math.random() * 5; }
+          }
+        }
+
+        drawShips(t, true);
+
+        // ---- 輪の奥半分：内側の壁（街が張りついている面）が見える ----
+        for (let i = 0; i < N; i++) {
+          const t0 = rot + i * DTH, t1 = t0 + DTH, sm = Math.sin(t0 + DTH / 2);
+          if (sm <= 0) continue;
+          const c0 = Math.cos(t0), s0 = Math.sin(t0), c1 = Math.cos(t1), s1 = Math.sin(t1), RO = R + T;
+          x.globalAlpha = 1;
+          x.fillStyle = shTop(0.2 + 0.5 * sm);
+          P(R * c0, HH, R * s0, 0); P(R * c1, HH, R * s1, 1); P(RO * c1, HH, RO * s1, 2); P(RO * c0, HH, RO * s0, 3); quad();
+          x.fillStyle = shWall(0.15 + 0.85 * sm);
+          P(R * c0, HH, R * s0, 0); P(R * c1, HH, R * s1, 1); P(R * c1, -HH, R * s1, 2); P(R * c0, -HH, R * s0, 3); quad();
+          x.strokeStyle = 'rgba(150,185,255,0.10)'; x.lineWidth = 1;   // 骨組みの線
+          x.beginPath(); x.moveTo(o[0], o[1]); x.lineTo(o[6], o[7]); x.stroke();
+          for (const l of segs[i].wall) {                               // 街の灯り
+            const a = t0 + l.u * DTH;
+            P(R * Math.cos(a), l.v * HH, R * Math.sin(a), 0);
+            const z = LS * K;
+            x.globalAlpha = l.a * (0.6 + 0.4 * Math.sin(t * l.s + l.p)) * (0.55 + 0.45 * sm);
+            x.fillStyle = l.c; x.fillRect(o[0] - z / 2, o[1] - z / 2, z, z);
+          }
+        }
+        x.globalAlpha = 1;
+        ringLine(R, HH, 0, PI, 'rgba(180,215,255,0.6)', 1.2);
+        ringLine(R + T, HH, 0, PI, 'rgba(150,190,255,0.3)', 1);
+        ringLine(R - 0.003, -0.02, 0, PI, 'rgba(120,225,255,0.28)', 1);  // 街を一周する環状線
+        for (let q = 0; q < 3; q++) {                                     // 環状線を走る列車
+          const a0 = (t * 0.2 + q * TAU / 3) % TAU;
+          if (Math.sin(a0 + 0.07) <= 0) continue;
+          x.lineCap = 'round';
+          ringLine(R - 0.004, -0.02, a0, a0 + 0.14, 'rgba(120,225,255,0.3)', Math.max(3, LS * 3));
+          ringLine(R - 0.004, -0.02, a0, a0 + 0.14, '#dffbff', Math.max(1.4, LS * 1.1));
+          x.lineCap = 'butt';
+        }
+
+        for (const b of builds) b.sn = Math.sin(b.th + rot);
+        order.length = 0; for (const b of builds) order.push(b);
+        order.sort((p, q) => q.sn - p.sn);                               // 奥から手前の順に描く
+        let bi = 0;
+        for (; bi < order.length && order[bi].sn > 0; bi++) building(order[bi], order[bi].th + rot, true);
+        for (let q = bi - 1; q >= 0; q--) {                               // 高い建物の先で点滅する灯り
+          const b = order[q]; if (!b.tall) continue;
+          const a = b.th + rot;
+          P((R - b.b) * Math.cos(a), b.y, (R - b.b) * Math.sin(a), 0);
+          if (Math.sin(t * 2.4 + b.p) > 0.5) dot(o[0], o[1], Math.max(1.1, LS * K * 0.8), '#ff5a6a', 1);
+        }
+
+        for (let j = 0; j < SPOKES; j++) { const th = rot + j * TAU / SPOKES; if (Math.sin(th) > 0) spoke(th, t, j); }
+
+        // ---- 中心の塔 ----
+        x.globalAlpha = 1;
+        cyl(HUB, -3.2, -DRUMH);
+        cyl(DRUM, -DRUMH, DRUMH);
+        x.fillStyle = '#272a35'; x.beginPath();
+        for (let i = 0; i <= 40; i++) { const a = i * TAU / 40; P(DRUM * Math.cos(a), DRUMH, DRUM * Math.sin(a), 0); if (i) x.lineTo(o[0], o[1]); else x.moveTo(o[0], o[1]); }
+        x.fill();
+        cyl(HUB, DRUMH, 0.8); cyl(HUB, 0.8, 1.3, 0.7); cyl(HUB, 1.3, 1.9, 0.45); cyl(HUB, 1.9, 4.5, 0.28);
+        for (const l of hubL) {
+          const a = l.g + rot, sn = Math.sin(a);
+          if (sn >= -0.05) continue;
+          P(l.rr * Math.cos(a), l.y, l.rr * Math.sin(a), 0);
+          const z = LS * K * (l.rr === DRUM ? 1 : 0.85);
+          x.globalAlpha = l.a * (0.6 + 0.4 * Math.sin(t * l.s + l.p)) * Math.min(1, -sn * 2.2);
+          x.fillStyle = l.c; x.fillRect(o[0] - z / 2, o[1] - z / 2, z, z);
+        }
+        for (let q = 0; q < 4; q++) {                                     // 塔を上り下りするエレベーター
+          const up = q % 2 === 0, ph = (t * 0.11 + q * 0.27) % 1;
+          const yy = up ? DRUMH + ph * 3.2 : -DRUMH - ph * 2.2, a = PI * (1.32 + q * 0.12);
+          P(HUB * Math.cos(a), yy, HUB * Math.sin(a), 0); const ex = o[0], ey = o[1];
+          P(HUB * Math.cos(a), yy + (up ? -0.09 : 0.09), HUB * Math.sin(a), 1);
+          x.globalAlpha = 0.45; x.strokeStyle = '#aee6ff'; x.lineWidth = Math.max(1, LS * 0.7);
+          x.beginPath(); x.moveTo(ex, ey); x.lineTo(o[2], o[3]); x.stroke();
+          dot(ex, ey, Math.max(1.2, LS * K * 0.9), '#ffffff', 1);
+        }
+        x.globalAlpha = 1;
+
+        for (let j = 0; j < SPOKES; j++) { const th = rot + j * TAU / SPOKES; if (Math.sin(th) <= 0) spoke(th, t, j); }
+
+        // ---- 輪の手前半分：外側の壁（船体）が見える ----
+        for (; bi < order.length; bi++) building(order[bi], order[bi].th + rot, false);
+        for (let i = 0; i < N; i++) {
+          const t0 = rot + i * DTH, t1 = t0 + DTH, tm = t0 + DTH / 2, sm = Math.sin(tm);
+          if (sm > 0) continue;
+          const c0 = Math.cos(t0), s0 = Math.sin(t0), c1 = Math.cos(t1), s1 = Math.sin(t1), RO = R + T;
+          const lit = 0.08 + 0.26 * -sm + 0.62 * Math.max(0, -Math.cos(tm)) * (0.4 - 0.6 * sm);
+          x.globalAlpha = 1;
+          x.fillStyle = shTop(0.3 + 0.5 * Math.max(0, -Math.cos(tm)));
+          P(R * c0, HH, R * s0, 0); P(R * c1, HH, R * s1, 1); P(RO * c1, HH, RO * s1, 2); P(RO * c0, HH, RO * s0, 3); quad();
+          x.fillStyle = shHull(lit);
+          P(RO * c0, HH, RO * s0, 0); P(RO * c1, HH, RO * s1, 1); P(RO * c1, -HH, RO * s1, 2); P(RO * c0, -HH, RO * s0, 3); quad();
+          if (i % 2 === 0) {
+            x.strokeStyle = 'rgba(160,190,255,0.09)'; x.lineWidth = 1;
+            x.beginPath(); x.moveTo(o[0], o[1]); x.lineTo(o[6], o[7]); x.stroke();
+          }
+          for (const l of segs[i].hull) {
+            const a = t0 + l.u * DTH;
+            P(RO * Math.cos(a), l.v * HH, RO * Math.sin(a), 0);
+            const z = LS * K * 0.9;
+            x.globalAlpha = l.a * Math.min(1, -sm * 3); x.fillStyle = l.c; x.fillRect(o[0] - z / 2, o[1] - z / 2, z, z);
+          }
+        }
+        x.globalAlpha = 1;
+        ringLine(R, HH, PI, TAU, 'rgba(170,205,255,0.45)', 1);
+        ringLine(R + T, HH, PI, TAU, 'rgba(205,228,255,0.8)', 1.3);
+        ringLine(R + T, -HH, PI, TAU, 'rgba(120,150,230,0.25)', 1);
+        for (let q = 0; q < 14; q++) {                                    // 輪の縁をぐるりと走る誘導灯
+          const a = -t * 0.42 + q * TAU / 14, sn = Math.sin(a);
+          if (sn > -0.04) continue;
+          P((R + T) * Math.cos(a), 0, (R + T) * Math.sin(a), 0);
+          dot(o[0], o[1], Math.max(1.3, LS * K), '#8fe9ff', Math.min(1, -sn * 4));
+        }
+        x.globalAlpha = 1;
+
+        drawShips(t, false);
+      }
+
+      let raf = 0, prev = 0;
+      function loop(ms) {
+        raf = requestAnimationFrame(loop);
+        if (ms - prev < 32) return;            // 約30fpsに抑えて負荷を軽くする
+        prev = ms; frame(ms);
+      }
+      function start() {
+        cancelAnimationFrame(raf);
+        frame(performance.now());              // まず1枚すぐに描く
+        if (!still) { raf = requestAnimationFrame(loop); return; }
+        if (!bg) setTimeout(start, 300);
+      }
+      let rz = 0;
+      window.addEventListener('resize', () => {
+        clearTimeout(rz);
+        rz = setTimeout(() => { build(); frame(performance.now()); }, 150);
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (e.pointerType === 'touch' || !W) return;
+        mx = e.clientX / W - 0.5; my = e.clientY / H - 0.5;
+      }, { passive: true });
+      if (still) window.addEventListener('scroll', () => frame(0), { passive: true });
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) cancelAnimationFrame(raf); else start();
+      });
+      model(); build(); start();
+    })();
   </script>
 </body>
 </html>
