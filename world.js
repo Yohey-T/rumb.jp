@@ -37,7 +37,7 @@ function init() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 1, 9000);
 
-  const SUN = new THREE.Vector3(-0.30, 0.21, -1).normalize();
+  const SUN = new THREE.Vector3(-0.30, 0.31, -1).normalize();
   const CITY_Y = 150;
   const U = {                                   // すべての材質で共有する値
     uTime: { value: 0 },
@@ -404,7 +404,7 @@ function init() {
       const dx = x, dz = z - 430, d = Math.hypot(dx, dz);
       if (d < 26) continue;
       let h = 7 + rnd() * rnd() * 70;
-      const side = Math.abs(dx) > .34 * d || dz > 0;        // 視界の中央（都市の手前）は低く、脇は高く
+      const side = Math.abs(dx) > .52 * d || dz > 0;        // 視界の中央（都市の手前）は低く、脇は高く
       h = Math.min(h, side ? 42 + .2 * d : 33 + .055 * d);
       let ok = true;
       for (const s of samples) if (Math.hypot(x - s.x, z - s.z) < 34 && h > s.y - 16) { ok = false; break; }
@@ -514,6 +514,62 @@ function init() {
     craft.instanceMatrix.needsUpdate = true; fPos.needsUpdate = true;
   }
 
+  /* ================= 霞の中に立つ巨大な題字「Rumb」 =================
+     文字を1枚の絵に描き、世界の中（地上の街と浮遊都市の間）に光る看板として立てる。
+     霧でかすみ、手前のビルに一部が隠れる。スクロールで離れると消える。 */
+  const TITLE_Z = 200, TITLE_D = 430 - TITLE_Z, TITLE_FILL = { v: .8 };
+  const titleMat = new THREE.ShaderMaterial({
+    uniforms: { ...U, uMap: { value: null }, uFade: { value: 0 } },
+    transparent: true, depthWrite: false,
+    vertexShader: /* glsl */`
+      varying vec2 vUv; varying vec3 vWorld;
+      void main(){ vUv = uv; vec4 wp = modelMatrix * vec4(position, 1.); vWorld = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }`,
+    fragmentShader: COMMON + /* glsl */`
+      uniform sampler2D uMap; uniform float uFade;
+      varying vec2 vUv; varying vec3 vWorld;
+      void main(){
+        float a = texture2D(uMap, vUv).a;
+        vec3 toC = vWorld - cameraPosition; float d = length(toC);
+        float n = vnoise2(vWorld.xy * .045 + vec2(uTime * .05, -uTime * .02));
+        vec3 col = vec3(1., .88, .66) * 2.5 * (.93 + .07 * sin(uTime * 1.3 + vUv.x * 9.));
+        col = mix(col, haze(toC / d), fogAmount(d, vWorld.y, cameraPosition.y) * .5);
+        a *= mix(.4, 1., smoothstep(.2, .36, vUv.y + (n - .5) * .16));   /* 足もとは砂ぼこりに溶ける */
+        gl_FragColor = vec4(col, a * uFade * .94);
+        ${TAIL}
+      }`,
+  });
+  const title = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), titleMat);
+  title.visible = false; title.renderOrder = 1; scene.add(title);
+  let titleOn = false;
+  function layoutTitle() {
+    const half = Math.tan(camera.fov * Math.PI / 360) * camera.aspect;         // 画面の横半分の広がり
+    const w = Math.min(262, .88 * 2 * TITLE_D * half / TITLE_FILL.v), h = w * 640 / 2048;
+    title.scale.set(w, h, 1);
+    title.position.set(0, (camera.aspect < 1 ? 54 : 48) + h * .247, TITLE_Z);   // 文字の下端が屋根の連なりのすぐ上に来る高さ
+  }
+  function makeTitle() {
+    const c = document.createElement('canvas'); c.width = 2048; c.height = 640;
+    const g = c.getContext('2d'), txt = 'Rumb', fs = 470, gap = fs * .3;
+    g.font = `400 ${fs}px Jost, Inter, sans-serif`; g.textBaseline = 'alphabetic'; g.fillStyle = '#fff';
+    const ws = [...txt].map((ch) => g.measureText(ch).width);
+    const total = ws.reduce((a, b) => a + b, 0) + gap * (txt.length - 1);
+    TITLE_FILL.v = total / c.width + .02;
+    for (const blur of [34, 0]) {                         // にじんだ光の輪 → くっきりした文字 の順に重ねる
+      g.shadowColor = 'rgba(255,255,255,.9)'; g.shadowBlur = blur; g.globalAlpha = blur ? .55 : 1;
+      let x = (c.width - total) / 2;
+      [...txt].forEach((ch, i) => { g.fillText(ch, x, 478); x += ws[i] + gap; });
+    }
+    const tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    titleMat.uniforms.uMap.value = tex;
+    layoutTitle(); title.visible = true; titleOn = true;
+    root.classList.add('title3d');
+    if (still) draw(0);
+  }
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('400 100px Jost', 'Rumb').then((f) => { if (f && f.length) makeTitle(); }).catch(() => {});
+  }
+
   /* ================= 光のにじみ（後処理）と描画の大きさ ================= */
   let composer = null, bloom = null, useBloom = !low;
   if (useBloom) {
@@ -526,8 +582,8 @@ function init() {
       composer.addPass(new OutputPass());
     } catch (e) { composer = null; useBloom = false; }
   }
-  const dprMax = Math.min(window.devicePixelRatio || 1, low ? 1.5 : 2);
-  const dprMin = Math.min(dprMax, low ? .8 : .9);
+  const dprMax = Math.min(window.devicePixelRatio || 1, low ? 1.5 : 1.75);
+  const dprMin = Math.min(dprMax, low ? .8 : 1);
   let pr = dprMax, W = 0, H = 0, scrollMax = 1;
   function resize(force) {
     const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
@@ -539,6 +595,7 @@ function init() {
     const asp = W / H;
     camera.aspect = asp; camera.fov = asp < 1 ? 45 + (1 - asp) * 38 : 45; camera.updateProjectionMatrix();
     U.uPx.value = H * pr * .5 / Math.tan(camera.fov * Math.PI / 360);
+    if (titleOn) layoutTitle();
   }
 
   /* ================= 毎フレームの更新 ================= */
@@ -546,7 +603,7 @@ function init() {
   const cp = new THREE.Vector3(), ct = new THREE.Vector3(), right = new THREE.Vector3();
   const stats = { ms: 0, pr, bloom: useBloom, frames: 0 };
   window.__rumb = stats;
-  let acc = 0, cnt = 0, settle = 40, slow = 0;
+  let acc = 0, cnt = 0, settle = 40, slow = 0, tried = null, locked = false;
 
   function draw(dt) {
     U.uTime.value = t;
@@ -561,6 +618,7 @@ function init() {
     ringHold.rotation.set(.1 + Math.sin(t * .11) * .03, 0, .3 + Math.cos(t * .09) * .03);
     ring.rotation.y = -t * .085;
     updateFlyers(t);
+    if (titleOn) { const k = Math.min(1, Math.max(0, (p - .05) / .2)); titleMat.uniforms.uFade.value = 1 - k * k * (3 - 2 * k); title.visible = k < 1; }
 
     const u = pathU(p);
     posCurve.getPoint(u, cp); lookCurve.getPoint(u, ct);
@@ -589,11 +647,18 @@ function init() {
     if (raw < 200) { acc += raw; cnt++; }
     if (cnt >= 50) {
       const avg = acc / cnt; acc = 0; cnt = 0; stats.ms = avg;
+      if (locked) return;
       slow = avg > 23 ? slow + 1 : 0;
       if (slow >= 2) {
-        slow = 0;
-        if (pr > dprMin + .01) { pr = Math.max(dprMin, pr * .82); resize(true); settle = 20; }
-        else if (useBloom) { useBloom = false; settle = 20; }
+        slow = 0; settle = 20;
+        if (!tried) tried = { avg, pr, bloom: useBloom };
+        if (pr > dprMin + .01) { pr = Math.max(dprMin, pr * .8); resize(true); }
+        else if (useBloom) useBloom = false;
+        else {
+          /* いちばん軽くしても速くならないなら、原因は画質ではない（省電力で30コマに制限されている等）。元の画質に戻して以後は触らない */
+          if (avg > tried.avg * .88) { pr = tried.pr; useBloom = tried.bloom; resize(true); }
+          locked = true;
+        }
         stats.pr = pr; stats.bloom = useBloom;
       }
     }
@@ -612,8 +677,8 @@ function init() {
     mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5;
   }, { passive: true });
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancelAnimationFrame(raf); else start(); });
-  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); cancelAnimationFrame(raf); root.classList.remove('has3d'); });
-  canvas.addEventListener('webglcontextrestored', () => { shown = false; start(); });
+  canvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); cancelAnimationFrame(raf); root.classList.remove('has3d', 'title3d'); });
+  canvas.addEventListener('webglcontextrestored', () => { shown = false; if (titleOn) root.classList.add('title3d'); start(); });
 
   resize(true);
   start();
