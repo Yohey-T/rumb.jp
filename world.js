@@ -519,22 +519,27 @@ function init() {
      霧でかすみ、手前のビルに一部が隠れる。スクロールで離れると消える。 */
   const TITLE_Z = 200, TITLE_D = 430 - TITLE_Z, TITLE_FILL = { v: .8 };
   const titleMat = new THREE.ShaderMaterial({
-    uniforms: { ...U, uMap: { value: null }, uFade: { value: 0 } },
+    uniforms: { ...U, uMap: { value: null }, uFade: { value: 0 }, uBoost: { value: 1 } },
     transparent: true, depthWrite: false,
     vertexShader: /* glsl */`
       varying vec2 vUv; varying vec3 vWorld;
       void main(){ vUv = uv; vec4 wp = modelMatrix * vec4(position, 1.); vWorld = wp.xyz; gl_Position = projectionMatrix * viewMatrix * wp; }`,
     fragmentShader: COMMON + /* glsl */`
-      uniform sampler2D uMap; uniform float uFade;
+      uniform sampler2D uMap; uniform float uFade; uniform float uBoost;
       varying vec2 vUv; varying vec3 vWorld;
       void main(){
-        float a = texture2D(uMap, vUv).a;
+        vec4 tx = texture2D(uMap, vUv); float a = tx.r; float back = tx.b;   /* r=文字、b=文字の後ろに広がる暗い煙 */
         vec3 toC = vWorld - cameraPosition; float d = length(toC);
         float n = vnoise2(vWorld.xy * .045 + vec2(uTime * .05, -uTime * .02));
-        vec3 col = vec3(1., .88, .66) * 2.5 * (.93 + .07 * sin(uTime * 1.3 + vUv.x * 9.));
+        vec3 col = vec3(1., .9, .7) * ${low ? '3.1' : '1.45'} * uBoost * (.93 + .07 * sin(uTime * 1.3 + vUv.x * 9.));
         col = mix(col, haze(toC / d), fogAmount(d, vWorld.y, cameraPosition.y) * .5);
-        a *= mix(.4, 1., smoothstep(.2, .36, vUv.y + (n - .5) * .16));   /* 足もとは砂ぼこりに溶ける */
-        gl_FragColor = vec4(col, a * uFade * .94);
+        float foot = mix(.6, 1., smoothstep(.2, .34, vUv.y + (n - .5) * .14));   /* 足もとは砂ぼこりに溶ける */
+        a = min(a * foot, 1.);
+        /* 文字のまわりだけ霞を暗く沈めて、後ろの光に埋もれないようにする */
+        float shade = min(back * (.8 + .14 * n), .8) * foot * ${low ? '.7' : '1.'};
+        vec3 dark = haze(toC / d) * vec3(.15, .105, .072);
+        float alpha = a + shade * (1. - a);
+        gl_FragColor = vec4(mix(dark, col, a / max(alpha, 1e-4)), alpha * uFade);
         ${TAIL}
       }`,
   });
@@ -545,7 +550,7 @@ function init() {
     const half = Math.tan(camera.fov * Math.PI / 360) * camera.aspect;         // 画面の横半分の広がり
     const w = Math.min(262, .88 * 2 * TITLE_D * half / TITLE_FILL.v), h = w * 640 / 2048;
     title.scale.set(w, h, 1);
-    title.position.set(0, (camera.aspect < 1 ? 54 : 48) + h * .247, TITLE_Z);   // 文字の下端が屋根の連なりのすぐ上に来る高さ
+    title.position.set(0, (camera.aspect < 1 ? 56 : 52) + h * .247, TITLE_Z);   // 文字の下端が屋根の連なりのすぐ上に来る高さ
   }
   function makeTitle() {
     const c = document.createElement('canvas'); c.width = 2048; c.height = 640;
@@ -554,10 +559,15 @@ function init() {
     const ws = [...txt].map((ch) => g.measureText(ch).width);
     const total = ws.reduce((a, b) => a + b, 0) + gap * (txt.length - 1);
     TITLE_FILL.v = total / c.width + .02;
-    for (const blur of [34, 0]) {                         // にじんだ光の輪 → くっきりした文字 の順に重ねる
-      g.shadowColor = 'rgba(255,255,255,.9)'; g.shadowBlur = blur; g.globalAlpha = blur ? .55 : 1;
-      let x = (c.width - total) / 2;
-      [...txt].forEach((ch, i) => { g.fillText(ch, x, 478); x += ws[i] + gap; });
+    g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height);
+    g.globalCompositeOperation = 'lighter';
+    /* 青＝文字の後ろに広がる暗い煙（大きくぼかす）、赤＝光る文字（薄い光の輪＋くっきりした本体） */
+    for (const [color, blur, alpha, reps] of [['#00f', 75, 1, 4], ['#f00', 26, .4, 1], ['#f00', 0, 1, 1]]) {
+      g.fillStyle = color; g.shadowColor = color; g.shadowBlur = blur; g.globalAlpha = alpha;
+      for (let k = 0; k < reps; k++) {
+        let x = (c.width - total) / 2;
+        [...txt].forEach((ch, i) => { g.fillText(ch, x, 478); x += ws[i] + gap; });
+      }
     }
     const tex = new THREE.CanvasTexture(c);
     tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -618,7 +628,7 @@ function init() {
     ringHold.rotation.set(.1 + Math.sin(t * .11) * .03, 0, .3 + Math.cos(t * .09) * .03);
     ring.rotation.y = -t * .085;
     updateFlyers(t);
-    if (titleOn) { const k = Math.min(1, Math.max(0, (p - .05) / .2)); titleMat.uniforms.uFade.value = 1 - k * k * (3 - 2 * k); title.visible = k < 1; }
+    if (titleOn) { const k = Math.min(1, Math.max(0, (p - .05) / .2)); titleMat.uniforms.uFade.value = 1 - k * k * (3 - 2 * k); title.visible = k < 1; titleMat.uniforms.uBoost.value = still ? 1.15 : 1 + .3 * Math.exp(-t * .4); }
 
     const u = pathU(p);
     posCurve.getPoint(u, cp); lookCurve.getPoint(u, ct);
