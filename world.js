@@ -536,7 +536,7 @@ function init() {
         float foot = mix(.6, 1., smoothstep(.2, .34, vUv.y + (n - .5) * .14));   /* 足もとは砂ぼこりに溶ける */
         a = min(a * foot, 1.);
         /* 文字のまわりだけ霞を暗く沈めて、後ろの光に埋もれないようにする */
-        float shade = min(back * (.8 + .14 * n), .8) * foot * ${low ? '.7' : '1.'};
+        float shade = min(back * (.8 + .14 * n), .8) * foot * ${low ? '.4' : '1.'};
         vec3 dark = haze(toC / d) * vec3(.15, .105, .072);
         float alpha = a + shade * (1. - a);
         gl_FragColor = vec4(mix(dark, col, a / max(alpha, 1e-4)), alpha * uFade);
