@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" data-state="idle">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>KohKey Line</title>
+  <meta name="description" content="A phone line for the morning you take a step. Call, listen, and leave a few words for someone taking a step tomorrow.">
+  <meta name="theme-color" content="#efede8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111110" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="line">
+
+    <header class="head">
+      <!-- ロゴが届いたら、この中身を <img src="logo.svg" alt="KohKey Line"> に差し替える -->
+      <p class="brand" id="brand">KohKey Line</p>
+    </header>
+
+    <main class="body">
+      <p class="number" id="number" aria-label="Phone number"></p>
+
+      <p class="status" role="status">
+        <span class="dot" id="dot" aria-hidden="true"></span>
+        <span id="status">Line open</span>
+      </p>
+
+      <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+
+      <p class="caption" id="caption" aria-live="polite"></p>
+
+      <!-- 待ち受け -->
+      <section class="panel" data-panel="idle">
+        <button class="round round--fill" id="btn-call" type="button">Call</button>
+        <p class="hint">The call runs in your browser. Free. Sound on.</p>
+        <p class="hint" id="dial-row" hidden>Or dial it from any phone: <a id="dial-link" href="#"></a></p>
+      </section>
+
+      <!-- 通話中 -->
+      <section class="panel" data-panel="call" hidden>
+        <div class="keys">
+          <button class="key" id="key-1" type="button" aria-label="1, hear the music">
+            <span class="key__digit">1</span><span class="key__label">Music</span>
+          </button>
+          <button class="key" id="key-2" type="button" aria-label="2, leave a few words">
+            <span class="key__digit">2</span><span class="key__label">Leave a word</span>
+          </button>
+        </div>
+        <button class="round round--line" id="btn-end" type="button">End</button>
+      </section>
+
+      <!-- 録音前の注意書き -->
+      <section class="panel panel--sheet" data-panel="notice" hidden>
+        <h2 class="sheet__title">Before you leave a word</h2>
+        <ul class="rules">
+          <li>Please don&rsquo;t say your name.</li>
+          <li>You have up to 30 seconds.</li>
+          <li>Any language is welcome.</li>
+          <li>You must be 18 or older.</li>
+          <li>Only the person who made this record will hear it.</li>
+          <li>This is not a helpline. If you need someone to talk to, visit <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a>.</li>
+        </ul>
+        <label class="agree">
+          <input type="checkbox" id="agree">
+          <span>I&rsquo;m 18 or older, and I agree to be recorded.</span>
+        </label>
+        <p class="alert" id="notice-msg" role="alert" hidden></p>
+        <button class="bar bar--fill" id="btn-record" type="button" disabled>Start recording</button>
+        <button class="bar bar--text" id="btn-back" type="button">Back</button>
+        <p class="hint">Your browser will ask to use the microphone.</p>
+      </section>
+
+      <!-- 録音中 -->
+      <section class="panel" data-panel="recording" hidden>
+        <button class="round round--line" id="btn-stop" type="button">Stop</button>
+        <p class="hint">Speak when you&rsquo;re ready. It stops by itself at 30 seconds.</p>
+      </section>
+
+      <!-- 聴き直し -->
+      <section class="panel panel--sheet" data-panel="review" hidden>
+        <p class="alert" id="review-msg" role="alert" hidden></p>
+        <button class="bar bar--line" id="btn-play" type="button">Play it back</button>
+        <button class="bar bar--fill" id="btn-send" type="button">Send</button>
+        <button class="bar bar--text" id="btn-discard" type="button">Discard</button>
+      </section>
+
+      <!-- 終話 -->
+      <section class="panel" data-panel="ended" hidden>
+        <p class="endnote" id="endnote" hidden></p>
+        <button class="round round--line" id="btn-again" type="button">Call again</button>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>This line is not a helpline. If you need someone to talk to, visit <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a>.</p>
+      <p id="about-row" hidden><a id="about-link" href="#">About this line and removal requests</a></p>
+      <p class="tag" id="preview-tag" hidden>Preview: messages are not sent yet.</p>
+    </footer>
+
+  </div>
+
+  <audio id="player" preload="auto" playsinline></audio>
+
+  <script src="config.js"></script>
+  <script src="send.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
