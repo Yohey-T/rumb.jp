@@ -271,9 +271,15 @@
       tickRecording();
       recTimer = setInterval(tickRecording, 100);
       startMeter(s);
-    }).catch(function () {
+    }).catch(function (err) {
       el.record.disabled = !el.agree.checked;
-      showMsg(el.noticeMsg, 'The microphone is off for this page. Allow it in your browser, then try again.');
+      var name = err && err.name;
+      var text = name === 'NotFoundError' || name === 'OverconstrainedError'
+        ? 'No microphone was found on this device.'
+        : name === 'NotReadableError'
+        ? 'Another app is using the microphone. Close it, then try again.'
+        : 'The microphone is blocked here. If you opened this page inside another app, open it in Chrome or Safari instead. Otherwise, allow the microphone in your browser’s site settings, then try again.';
+      showMsg(el.noticeMsg, text);
     });
   }
 
