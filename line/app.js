@@ -1,5 +1,6 @@
 /* KohKey Line — 画面の動き。
-   流れ： かける → welcome → menu → track-web → goodbye → 終話
+   流れ： かける → すぐ track-web（途中でも 1・2 可）→ menu → 6秒待つ → goodbye → 終話
+          （曲の頭が「Welcome to the program」なので welcome は流さない。電話と同じ）
           2 を押す → 注意書き（before-record）→ 録音 → 聴き直し → 送る → thanks → goodbye → 終話
    文言や番号は config.js、送り先は send.js にある。 */
 (function () {
@@ -186,8 +187,17 @@
       if (mine !== seq) return;
       startCallTimer();
       setState('call');
-      run(['welcome', 'menu', 'track-web'], closing);
+      run(['track-web'], menuThenClose);
     }, 1400);
+  }
+
+  // 曲のあと：案内を流し、何も押されないまま6秒たったら終わりの案内へ（電話の Gather timeout と同じ）
+  function menuThenClose() {
+    setState('call');
+    run(['menu'], function () {
+      var mine = seq;
+      setTimeout(function () { if (mine === seq && state === 'call') closing(); }, 6000);
+    });
   }
 
   function closing() {
@@ -209,10 +219,7 @@
     showMsg(el.endnote, note);
   }
 
-  function backToMenu() {
-    setState('call');
-    run(['menu']);
-  }
+  function backToMenu() { menuThenClose(); }
 
   function pressKey(n) {
     if (state !== 'call') return;
@@ -220,7 +227,7 @@
     key.setAttribute('aria-pressed', 'true');
     setTimeout(function () { key.removeAttribute('aria-pressed'); }, 180);
     if (n === 1) {
-      run(['track-web'], closing);
+      run(['track-web'], menuThenClose);
     } else {
       el.agree.checked = false;
       el.record.disabled = true;

@@ -93,6 +93,10 @@
 
     <footer class="foot">
       <p>This line is not a helpline. If you need someone to talk to, visit <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a>.</p>
+      <div class="ledger" id="ledger" hidden>
+        <p id="ledger-sum"></p>
+        <details><summary>Record of messages</summary><ol id="ledger-list"></ol></details>
+      </div>
       <p id="about-row" hidden><a id="about-link" href="#">About this line and removal requests</a></p>
       <p class="tag" id="preview-tag" hidden>Preview: messages are not sent yet.</p>
     </footer>
@@ -102,6 +106,7 @@
   <audio id="player" preload="auto" playsinline></audio>
 
   <script src="config.js"></script>
+  <script src="ledger.js"></script>
   <script src="send.js"></script>
   <script src="app.js"></script>
 </body>
