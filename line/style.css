@@ -90,6 +90,13 @@ button { font: inherit; color: inherit; -webkit-tap-highlight-color: transparent
   font-variant-numeric: tabular-nums;
 }
 
+.assure {
+  margin: 0.75rem 0 0;
+  max-width: 24rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
 .status {
   margin: 0.875rem 0 0;
   display: inline-flex;
